@@ -40,6 +40,7 @@ ConfigReader::InitReturnValues ConfigReader::readConfig(const string &fileName){
 	const string keyBill_3("3");
 	const string keyBill_4("4");
 	const string keyBill_5("5");
+	const string keyBill_6("6");
 
 
 	CSimpleIniA ini;
@@ -71,6 +72,7 @@ ConfigReader::InitReturnValues ConfigReader::readConfig(const string &fileName){
 	const char *valueBill_3=ini.GetValue(sectionBills.c_str(), keyBill_3.c_str(), NULL);
 	const char *valueBill_4=ini.GetValue(sectionBills.c_str(), keyBill_4.c_str(), NULL);
 	const char *valueBill_5=ini.GetValue(sectionBills.c_str(), keyBill_5.c_str(), NULL);
+	const char *valueBill_6=ini.GetValue(sectionBills.c_str(), keyBill_6.c_str(), NULL);
 
 	if(valuePort==NULL){
 		err_str=string("Cannot load \"") + keyPort + "\" value from \"" + sectionPort + "\" section in config file";
@@ -191,6 +193,28 @@ ConfigReader::InitReturnValues ConfigReader::readConfig(const string &fileName){
 	    }else{
             Logger::instance().logInfo("Bill 5 value not defined");
             configValues.bill5_value=-1;
+	    }
+	}
+
+	if(valueBill_6==NULL){
+		err_str=string("Cannot load \"") + keyBill_6 + "\" value from \"" + sectionBills + "\" section in config file";
+        Logger::instance().logWarning(err_str);
+	}else{
+	    buf=string(valueBill_6);
+	    if(buf.length()>0){
+            Logger::instance().logInfo("Bill 6 value = "+string(valueBill_6));
+            billCounter++;
+            converter<<string(valueBill_6);
+            converter>>configValues.bill6_value;
+            if(converter.fail() || configValues.bill6_value<1){
+                Logger::instance().logInfo("Bill 6 value not valid!");
+                return INIT_RETURN_VALUE_LOAD_FAILED;
+            }
+            converter.clear();
+            converter.str(std::string());
+	    }else{
+            Logger::instance().logInfo("Bill 6 value not defined");
+            configValues.bill6_value=-1;
 	    }
 	}
 

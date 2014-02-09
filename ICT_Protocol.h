@@ -4,6 +4,7 @@
 #include <map>
 #include <stdint.h>
 #include <sstream>
+#include <time.h>
 #include "SerialPort.h"
 #include "config.h"
 #include "Logger.h"
@@ -11,19 +12,6 @@
 class ICT_Protocol{
 
 public:
-
-//    const ErrorList::value_type error[]={ std::make_pair(0x20, "Motor failure"),
-//                                    std::make_pair(0x21,
-//                                    std::make_pair(0x22, "Bill jam"),
-//                                    std::make_pair(0x23, "Bill remove"),
-//                                    std::make_pair(0x24, "Stacker open"),
-//                                    std::make_pair(0x25, "Sensor problem"),
-//                                    std::make_pair(0x27, "Bill fish"),
-//                                    std::make_pair(0x28, "Stacker problem"),
-//                                    std::make_pair(0x29, "Bill reject"),
-//                                    std::make_pair(0x2A, "Invalid command"),
-//                                    std::make_pair(0x2E, "Reserved"),
-//                                    std::make_pair(0x2F, "Error status is exclusion")};
 
     enum CommunicationLineState{
         COMMUNICATION_STATE_UNKNOWN=2,
@@ -71,6 +59,8 @@ private:
     void parseInput(unsigned char data);
     bool sendEnableAcceptor();
     bool sendDisableAcceptor();
+    bool sendBillAccept();
+    bool sendBillReject();
 
     CommunicationLineState commLineState;
     CommunicationLineState lastCommLineState;
@@ -78,5 +68,7 @@ private:
     DeviceEnableState lastDeviceInhibitState;
     uint32_t commErrorCounter;
     SerialPort port;
+    time_t sendTime;
+    time_t currentTime;
 };
 #endif

@@ -10,6 +10,7 @@ public:
 	int32_t bill3_value;
 	int32_t bill4_value;
 	int32_t bill5_value;
+	int32_t bill6_value;
 
 	ConfigurationValues():portName(""), bill1_value(-1){
 
