@@ -73,6 +73,7 @@ void ICT_Protocol::parseInput(unsigned char data){
     stringstream ss;
     unsigned char buf;
     string errorString;
+    bool accept_bill=false;
 
     switch(data){
         case (unsigned char)ICT_Protocol::MSG_DEVICE_POWERUP:
@@ -100,41 +101,71 @@ void ICT_Protocol::parseInput(unsigned char data){
                 break;
             }
 
-            //TODO here you check which values are defined in the config, and which will be accepted based on that
+            //Here you can check which values are defined in the config, and which will be accepted based on that
             switch(buf){
                 case 0x40:
                     ss<<ConfigReader::instance().configValues.bill1_value;
                     Logger::instance().logInfo("First bill type inserted - "+ss.str());
+                    if(ConfigReader::instance().configValues.bill1_value<1){
+                        Logger::instance().logWarning("Bill type "+ss.str()+" is disabled in the configuration");
+                    }else{
+                        accept_bill=true;
+                    }
                     ss.str(std::string());
                 break;
 
                 case 0x41:
                     ss<<ConfigReader::instance().configValues.bill2_value;
                     Logger::instance().logInfo("Second bill type inserted - "+ss.str());
+                    if(ConfigReader::instance().configValues.bill2_value<1){
+                        Logger::instance().logWarning("Bill type "+ss.str()+" is disabled in the configuration");
+                    }else{
+                        accept_bill=true;
+                    }
                     ss.str(std::string());
                 break;
 
                 case 0x42:
                     ss<<ConfigReader::instance().configValues.bill3_value;
                     Logger::instance().logInfo("Third bill type inserted - "+ss.str());
+                    if(ConfigReader::instance().configValues.bill3_value<1){
+                        Logger::instance().logWarning("Bill type "+ss.str()+" is disabled in the configuration");
+                    }else{
+                        accept_bill=true;
+                    }
                     ss.str(std::string());
                 break;
 
                 case 0x43:
                     ss<<ConfigReader::instance().configValues.bill4_value;
                     Logger::instance().logInfo("Fourth bill type inserted - "+ss.str());
+                    if(ConfigReader::instance().configValues.bill4_value<1){
+                        Logger::instance().logWarning("Bill type "+ss.str()+" is disabled in the configuration");
+                    }else{
+                        accept_bill=true;
+                    }
                     ss.str(std::string());
                 break;
 
                 case 0x44:
                     ss<<ConfigReader::instance().configValues.bill5_value;
                     Logger::instance().logInfo("Fifth bill type inserted - "+ss.str());
+                    if(ConfigReader::instance().configValues.bill5_value<1){
+                        Logger::instance().logWarning("Bill type "+ss.str()+" is disabled in the configuration");
+                    }else{
+                        accept_bill=true;
+                    }
                     ss.str(std::string());
                 break;
 
                 case 0x45:
                     ss<<ConfigReader::instance().configValues.bill6_value;
                     Logger::instance().logInfo("Sixth bill type inserted - "+ss.str());
+                    if(ConfigReader::instance().configValues.bill6_value<1){
+                        Logger::instance().logWarning("Bill type "+ss.str()+" is disabled in the configuration");
+                    }else{
+                        accept_bill=true;
+                    }
                     ss.str(std::string());
                 break;
 
@@ -143,7 +174,7 @@ void ICT_Protocol::parseInput(unsigned char data){
                 break;
             }
 
-            if(buf>=0x40 && buf<=0x45){
+            if(accept_bill){
                 Logger::instance().logInfo("Accepting the bill");
                 sendMessage(ICT_Protocol::MSG_CTRL_BILL_REQUEST_ACCEPT);
 
@@ -157,18 +188,24 @@ void ICT_Protocol::parseInput(unsigned char data){
                 Logger::instance().logInfo("Rejecting the bill");
                 sendMessage(ICT_Protocol::MSG_CTRL_BILL_REQUEST_REJECT);
             }
-
-
         break;
 
         case (unsigned char)ICT_Protocol::MSG_DEVICE_STATUS_RESP_INHIBIT:
             Logger::instance().logDebug("Status reasponse - device is in inhibit state");
             deviceInhibitState=DEVICE_STATE_DISABLED;
+            if(lastDeviceInhibitState!=deviceInhibitState){
+                //TODO report this to the application
+                lastDeviceInhibitState=deviceInhibitState;
+            }
         break;
 
         case (unsigned char)ICT_Protocol::MSG_DEVICE_STATUS_RESP_ENABLED:
             Logger::instance().logDebug("Status reasponse - device is ready to accept the bills");
             deviceInhibitState=DEVICE_STATE_ENABLED;
+            if(lastDeviceInhibitState!=deviceInhibitState){
+                //TODO report this to the application
+                lastDeviceInhibitState=deviceInhibitState;
+            }
         break;
 
         case (unsigned char)ICT_Protocol::MSG_DEVICE_BILL_ACCEPT_FINISH:
@@ -268,6 +305,11 @@ bool ICT_Protocol::sendBillReject()
     return sendMessage(ICT_Protocol::MSG_CTRL_BILL_REQUEST_REJECT);
 }
 
+
+bool ICT_Protocol::sendResetDevice()
+{
+    return sendMessage(ICT_Protocol::MSG_CTRL_RESET_DEVICE);
+}
 
 
 bool ICT_Protocol::init(string serialPortName)

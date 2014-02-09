@@ -61,6 +61,7 @@ private:
     bool sendDisableAcceptor();
     bool sendBillAccept();
     bool sendBillReject();
+    bool sendResetDevice();
 
     CommunicationLineState commLineState;
     CommunicationLineState lastCommLineState;
