@@ -39,8 +39,8 @@ bool portReadByte(SerialPort &port, unsigned char &data){
     data=(unsigned char)readData[0];
 #ifdef _DEBUG
     stringstream ss;
-    ss<<static_cast<unsigned>(data);
-    Logger::instance().logDebug("Received "+ss.str());
+    ss << std::hex << static_cast<unsigned>(data);
+    Logger::instance().logDebug("Received 0x" + ss.str());
     ss.str(std::string());
 #endif
 
