@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-c -O2 -Wall
 LDFLAGS=
-SOURCES=Logger.cpp SerialPort.cpp main.cpp
+SOURCES=Logger.cpp ConfigReader.cpp SerialPort.cpp ICT_Protocol.cpp main.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=ICT_Bill_Acceptor_Driver
 all: $(SOURCES) $(EXECUTABLE)

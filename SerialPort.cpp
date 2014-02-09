@@ -54,7 +54,7 @@ int32_t SerialPort::serialOpen(const std::string &portName, uint32_t baudRate, S
     portFileDescriptor = open(serial_port.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
 
     if(portFileDescriptor<0){
-        return errno;
+        return portFileDescriptor;
     }
 
     fcntl(portFileDescriptor, F_SETFL, 0);
@@ -64,7 +64,7 @@ int32_t SerialPort::serialOpen(const std::string &portName, uint32_t baudRate, S
     if(result<0){
         Logger::instance().logInfo("serial port parameters read call failed");
         close(portFileDescriptor);
-        return errno;
+        return result;
     }
 
 
@@ -157,26 +157,26 @@ int32_t SerialPort::serialOpen(const std::string &portName, uint32_t baudRate, S
     if(result<0){
     	Logger::instance().logError("set serial port input speed failed");
         close(portFileDescriptor);
-        return errno;
+        return result;
     }
     result=cfsetospeed(&newOptions, portSpeed);
     if(result<0){
     	Logger::instance().logError("set serial port output speed failed");
         close(portFileDescriptor);
-        return errno;
+        return result;
     }
 
     result=tcsetattr(portFileDescriptor, TCSANOW, &newOptions);
     if(result<0){
     	Logger::instance().logError("write serial port parameters failed");
         close(portFileDescriptor);
-        return errno;
+        return result;
     }
 
     result=tcflush(portFileDescriptor, TCIFLUSH);
     if(result<0){
     	Logger::instance().logError("serial port input flush failed");
-        return errno;
+        return result;
     }
 
 #endif
@@ -229,7 +229,7 @@ int32_t SerialPort::serialRead(char *data, int32_t maxDataLength){
 	if(result<0){
 		Logger::instance().logError("serialRead(), read serial port parameters call failed");
 		close(portFileDescriptor);
-		return errno;
+		return result;
 	}
 
     if(maxDataLength>1){
@@ -246,7 +246,7 @@ int32_t SerialPort::serialRead(char *data, int32_t maxDataLength){
 	if(result<0){
 		Logger::instance().logError("serialRead(), write serial port parameters failed");
 	        close(portFileDescriptor);
-	        return errno;
+	        return result;
 	}
 
     fcntl(portFileDescriptor, F_SETFL, 0);
@@ -281,13 +281,13 @@ int32_t SerialPort::serialWrite(const unsigned char *data, size_t dataLength){
 //    result=tcflush(portFileDescriptor, TCIFLUSH);
 //    if(result<0){
 //    	Logger::instance().logError("serial port input flush failed");
-//        return errno;
+//        return result;
 //    }
 
     result=write(portFileDescriptor, data, dataLength);
     if(result!=static_cast<int32_t>(dataLength)){
     	Logger::instance().logFatal("serial port write failed");
-        return errno;
+        return result;
     }else{
         result=E_OK;
     }
